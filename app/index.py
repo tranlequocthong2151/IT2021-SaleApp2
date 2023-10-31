@@ -1,9 +1,7 @@
-from flask import Flask, render_template, request
+from flask import render_template, request
 
 from app.services import product_service
-
-
-app = Flask(__name__)
+from app import app
 
 
 @app.get("/")

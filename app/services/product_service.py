@@ -2,12 +2,7 @@ from app.dao import product_dao
 
 
 def get_products(kw=None, category_id=None):
-    products = product_dao.get_products()
-
-    if kw:
-        products = list(filter(lambda product: product['name'].lower().find(kw.lower()) != -1, products))
-    if category_id:
-        products = list(filter(lambda product: product['category_id'] == int(category_id), products))
+    products = product_dao.get_products(kw=kw, category_id=category_id)
 
     return products
 
