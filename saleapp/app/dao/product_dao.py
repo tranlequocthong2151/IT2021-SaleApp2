@@ -1,4 +1,4 @@
-from app import Product
+from app.models.models import Product
 
 
 def get_products(kw=None, category_id=None):
@@ -13,4 +13,4 @@ def get_products(kw=None, category_id=None):
 
 
 def get_product(id):
-    return Product.query.get(id=int(id))
+    return Product.query.get(int(id))
