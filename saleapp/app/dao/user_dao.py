@@ -2,15 +2,17 @@ from app.models.models import User
 from app.extensions import db
 
 
-def get_user(username='', password='', email=''):
+def get_user(id=None, username='', password='', email=''):
     user = User.query
+    if id:
+        return user.get(id)
     if username:
         user = user.filter(User.username == username)
     if password:
         user = user.filter(User.password == password)
     if email:
         user = user.filter(User.email == email)
-    return user.all()[0] if user.all()[0] else None
+    return user.all()[0]
 
 
 def get_users():

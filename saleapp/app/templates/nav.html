@@ -1,0 +1,44 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container">
+        <a class="navbar-brand" href="/">Ban hang truc tuyen</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/products">Tất cả</a>
+                </li>
+                {% for category in categories %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/products?category_id={{category.id}}">{{category.name}}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            <form class="d-flex" role="search" action='/products'>
+                <input class="form-control me-2" type="search" placeholder="Từ khóa" aria-label="Search" name='kw'>
+                <button class="btn btn-outline-success" type="submit">Tìm</button>
+            </form>
+
+            <div class="mx-3">
+                {% if user %}
+                <div class="dropdown">
+                    <img class="rounded-circle user-avatar dropdown-toggle" src='{{user.avatar}}' alt='{{user.name}}'
+                        data-bs-toggle="dropdown" aria-expanded="false" />
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                        {% if user["user_role"] == 'ADMIN' %}
+                        <li><a class="dropdown-item" href="/admin">Manage</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item" href="/signout">Sign out</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <a href="/signin" class="btn btn-primary">Sign in</a>
+                <a href="/signup" class="btn btn-secondary">Sign up</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>

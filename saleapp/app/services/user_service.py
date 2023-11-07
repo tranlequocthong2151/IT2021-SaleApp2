@@ -6,6 +6,7 @@ def signin(username=None, password=None):
     if not username or not password:
         return 
 
+    password = hashlib.md5(password.encode()).hexdigest()
     return user_dao.get_user(username=username, password=password)
 
 
@@ -13,8 +14,8 @@ def get_users():
     return user_dao.get_users()
 
 
-def get_user(email):
-    return user_dao.get_user(email=email)
+def get_user(id, email):
+    return user_dao.get_user(id=id, email=email)
 
 
 def add_user(user):

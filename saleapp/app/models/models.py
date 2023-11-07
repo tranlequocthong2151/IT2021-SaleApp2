@@ -2,8 +2,9 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Integer, String, Column, ForeignKey, Float, Boolean, DateTime, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-import enum
+from flask_login import UserMixin
 
+import enum
 from app.extensions import db
 
 
@@ -13,6 +14,9 @@ class Category(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False, unique=True)
     products = relationship('Product', backref='category', lazy=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Product(db.Model):
@@ -31,7 +35,7 @@ class UserRole(enum.IntEnum):
     ADMIN = 1
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -43,5 +47,8 @@ class User(db.Model):
     avatar = Column(String(100))
     joined_date = Column(DateTime, server_default=func.now())
     user_role = Column(Enum(UserRole), default=UserRole.USER)
+
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 

@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, jsonify
 from flask_mail import Mail, Message
+from flask_login import LoginManager
 
 from config import Config
-from app.extensions import db
+from app.extensions import db 
+from app.admin import init_admin
 from app.services import product_service
 from app.services import category_service
 from app.services import user_service
@@ -19,17 +21,9 @@ def create_app(config_class=Config):
 
     db.init_app(app)
 
-    user = {
-        "id": 1,
-        "name": "Admin",
-        "email": "admin@gmail.com",
-        "username": "admin",
-        "active": 1,
-        "avatar": "https://res.cloudinary.com/dxxwcby8l/image/upload/v1647248722/r8sjly3st7estapvj19u.jpg",
-        "joined_date": "30/10/2023",
-        "user_role": "ADMIN"
-    }
-    user = None
+    init_admin(app, db)
+
+    login = LoginManager(app)
 
     manage_services = {
         'categories': category_service.get_categories,
@@ -37,13 +31,17 @@ def create_app(config_class=Config):
         'products': product_service.get_products,
     }
 
+    @login.user_loader
+    def load_user(user_id):
+        return user_service.get_user(user_id)
+
+
     @app.context_processor
     def inject_categories():
-        return dict(categories=category_service.get_categories(), user=user)
+        return dict(categories=category_service.get_categories(), user=session['user'] if 'user' in session else None)
 
 
     @app.get("/")
-    @signin_required
     def home():
         products = product_service.get_products()
 
@@ -51,7 +49,6 @@ def create_app(config_class=Config):
 
 
     @app.get("/products")
-    @signin_required
     def product_list():
         category_id = request.args.get('category_id')
         kw = request.args.get('kw')
@@ -62,7 +59,6 @@ def create_app(config_class=Config):
 
 
     @app.get("/products/<product_id>")
-    @signin_required
     def product_detail(product_id):
         product = product_service.get_product(product_id)
 
@@ -75,26 +71,23 @@ def create_app(config_class=Config):
 
 
     @app.get('/profile')
-    @signin_required
     def profile_page():
-        if user:
-            return render_template('profile.html', user=user)
+        if 'user' in session:
+            return render_template('profile.html', user=session['user'])
         else:
             return redirect('/')
 
 
     @app.get('/signout')
-    @signin_required
     def signout():
-        nonlocal user
-        if user:
-            user = None
+        if 'user' in session:
+            session.pop('user')
         return redirect('/')
 
 
     @app.get('/signin')
     def signin_page():
-        if user:
+        if 'user' in session:
             return redirect('/')
         else:
             return render_template('signin.html')
@@ -106,9 +99,10 @@ def create_app(config_class=Config):
         password = request.form.get('password')
 
         user = user_service.signin(username=username, password=password)
+        user = jsonify(user)
 
         if user:
-            session['user'] = user
+            session['user'] = user[0]
             return redirect('/')
         else:
             return render_template('signin.html', message='Sai tên tài khoản hoặc mật khẩu, xin vui lòng thử lại.')
@@ -116,7 +110,7 @@ def create_app(config_class=Config):
 
     @app.get('/signup')
     def signup_page():
-        if user:
+        if 'user' in session:
             return redirect('/')
         else:
             return render_template('signup.html')
@@ -139,7 +133,7 @@ def create_app(config_class=Config):
         token = token_service.generate_token(key=app.config.get('ITD_KEY'), salt=app.config.get('ITD_SALT'), email=email)
 
         msg = Message('Xác thực tài khoản', recipients=[email])
-        msg.body = f'Chào {full_name},\n\nĐây là mail xác thực đăng ký tài khoản tại trang web bán hàng trực tuyến\n\nVui lòng nhấp vào link này để xác thực: {request.url_root + 'confirm/' + token}\n\nLink sẽ hết hạn sau 1 tiếng\n\n\nTrân trọng,\nBán hàng trực tuyến'
+        msg.body = f'Chào {full_name},\n\nĐây là mail xác thực đăng ký tài khoản tại trang web bán hàng trực tuyến\n\nVui lòng nhấp vào link này để xác thực: {request.url_root + "confirm/" + token}\n\nLink sẽ hết hạn sau 1 tiếng\n\n\nTrân trọng,\nBán hàng trực tuyến'
 
         mail.send(msg)
         return render_template('signup.html', message="Bạn đã đăng ký thành công, vui lòng truy cập vào mail để xác thực tài khoản trước khi có thể sử dụng.")
@@ -159,21 +153,5 @@ def create_app(config_class=Config):
             return redirect('/signin')
         else:
             return '<h1>Error occurred</h1>'
-
-
-    # ADMIN routes
-    @app.get('/admin/manage')
-    @signin_required
-    def admin_manage_page():
-        return redirect('/admin/manage/categories')
-
-
-    @app.get('/admin/manage/<type>')
-    @signin_required
-    def admin_manage_by_type_page(type):
-        data = manage_services[type]()
-
-        return render_template(f'{type}_table.html', data=data)
-
 
     return app

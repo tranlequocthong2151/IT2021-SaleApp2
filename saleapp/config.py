@@ -4,6 +4,8 @@ from urllib.parse import quote
 
 
 class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+
     password = os.environ.get('DATABASE_PASSWORD')
 
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:%s@localhost:3306/saledb?charset=utf8mb4' % quote(password) 
@@ -19,3 +21,5 @@ class Config:
 
     ITD_KEY=os.environ.get('ITD_KEY')
     ITD_SALT=os.environ.get('ITD_SALT')
+    
+
