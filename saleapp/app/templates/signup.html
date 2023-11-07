@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if message %}
+<h4>{{message}}</h4>
+{% endif %}
+
+<form action='/signup' method='POST' class='auth-form'>
+    <div class='mb-3'>
+        <label for='full_name'>Fullname:</label>
+        <input type="text" required placeholder='John Doe' id='full_name' name='full_name'>
+    </div>
+
+    <div class='mb-3'>
+        <label for='email'>Email:</label>
+        <input type="text" required placeholder='example@gmail.com' id='email' name='email'>
+    </div>
+
+    <div class='mb-3'>
+        <label for='username'>Username:</label>
+        <input type="text" required placeholder='user' id='username' name='username'>
+    </div>
+
+    <div class='mb-3'>
+        <label for='password'>Password:</label>
+        <input type="password" required placeholder='P@55wOrD' id='password' name='password'>
+    </div>
+
+    <div class='mb-3'>
+        <label for='avatar'>Avatar:</label>
+        <input type="file" accept="image/*" name="avatar" placeholder='Avatar' id='avatar' name='avatar'>
+    </div>
+
+    <button type="submit" class='btn btn-primary'>Signup</button>
+</form>
+{% endblock %}

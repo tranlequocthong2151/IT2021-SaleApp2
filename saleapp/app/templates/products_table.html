@@ -1,0 +1,28 @@
+{% extends 'admin_manage.html' %}
+
+{% block table %}
+<table class="table text-center">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Price</th>
+            <th scope="col">Image</th>
+            <th scope="col">Category Id</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in data %}
+        <tr>
+            <th scope="row">{{ product.id }}</th>
+            <td>{{ product.name }}</td>
+            <td>{{ product.description }}</td>
+            <td>{{ product.price }}</td>
+            <td>{{ product.image }}</td>
+            <td>{{ product.category_id }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

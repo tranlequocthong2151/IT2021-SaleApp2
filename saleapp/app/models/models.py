@@ -39,7 +39,7 @@ class User(db.Model):
     email = Column(String(50), nullable=False, unique=True)
     username = Column(String(50), nullable=False, unique=True)
     password = Column(String(50), nullable=False)
-    active = Column(Boolean, default=True)
+    active = Column(Boolean, default=False)
     avatar = Column(String(100))
     joined_date = Column(DateTime, server_default=func.now())
     user_role = Column(Enum(UserRole), default=UserRole.USER)
