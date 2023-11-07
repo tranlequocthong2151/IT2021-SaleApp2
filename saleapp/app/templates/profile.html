@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class='container'>
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <img src="{{user.avatar}}" alt="{{user.name}}" class='img-thumbnail' style='width: 30%' />
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <div class="informations">
+                <div>ID: {{user.id}}</div>
+                <div>Email: {{user.email}}</div>
+                <div>Username: {{user.username}}</div>
+                <div>Active: {{user.active}}</div>
+                <div>Joined Date: {{user.joined_date}}</div>
+                <div>Role: {{user.user_role}}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

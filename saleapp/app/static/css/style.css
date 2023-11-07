@@ -1,0 +1,11 @@
+.user-avatar {
+    width: 30px;
+    height: 30px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
