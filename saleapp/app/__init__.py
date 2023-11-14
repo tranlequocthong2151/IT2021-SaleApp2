@@ -1,15 +1,21 @@
-from flask import Flask, render_template, request, redirect, session, jsonify
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from flask import Flask, render_template, request, redirect, session
 from flask_mail import Mail, Message
-from flask_login import LoginManager
+from flask_login import login_user, current_user, LoginManager, logout_user, login_required
+from flask_restful import Resource, Api
+import cloudinary.uploader
+import uuid
 
 from config import Config
-from app.extensions import db 
+from app.extensions import db, init_cloudinary
 from app.admin import init_admin
 from app.services import product_service
 from app.services import category_service
 from app.services import user_service
 from app.services import token_service
-from app.decorators.auth import signin_required
 
 
 def create_app(config_class=Config):
@@ -21,9 +27,12 @@ def create_app(config_class=Config):
 
     db.init_app(app)
 
+    init_cloudinary()
+
     init_admin(app, db)
 
     login = LoginManager(app)
+    login.login_view = 'signin'
 
     manage_services = {
         'categories': category_service.get_categories,
@@ -31,17 +40,38 @@ def create_app(config_class=Config):
         'products': product_service.get_products,
     }
 
+
+    @app.get('/carts')
+    def cart_page():
+        return render_template('cart.html')
+
+
+    @app.post('/carts/<product_id>')
+    def add_to_cart(product_id):
+        id = str(product_id)
+        if 'cart' not in session:
+            session['cart'] = {}
+
+        if id in session['cart']:
+            session['cart'][id] += 1
+        else: 
+            session['cart'][id] = 1
+        session.modified = True
+        return redirect('/products')
+
+
     @login.user_loader
     def load_user(user_id):
-        return user_service.get_user(user_id)
+        return user_service.get_user(id=user_id)
 
 
     @app.context_processor
     def inject_categories():
-        return dict(categories=category_service.get_categories(), user=session['user'] if 'user' in session else None)
+        return dict(categories=category_service.get_categories(), user=current_user)
 
 
     @app.get("/")
+    @login_required
     def home():
         products = product_service.get_products()
 
@@ -49,6 +79,7 @@ def create_app(config_class=Config):
 
 
     @app.get("/products")
+    @login_required
     def product_list():
         category_id = request.args.get('category_id')
         kw = request.args.get('kw')
@@ -59,10 +90,12 @@ def create_app(config_class=Config):
 
 
     @app.get("/products/<product_id>")
+    @login_required
     def product_detail(product_id):
         product = product_service.get_product(product_id)
 
         return render_template('product.html', product=product)
+
 
 
     @app.route('/test/')
@@ -71,23 +104,21 @@ def create_app(config_class=Config):
 
 
     @app.get('/profile')
+    @login_required
     def profile_page():
-        if 'user' in session:
-            return render_template('profile.html', user=session['user'])
-        else:
-            return redirect('/')
+        return render_template('profile.html', user=current_user)
 
 
     @app.get('/signout')
+    @login_required
     def signout():
-        if 'user' in session:
-            session.pop('user')
-        return redirect('/')
+        logout_user()
+        return redirect('/signin')
 
 
     @app.get('/signin')
     def signin_page():
-        if 'user' in session:
+        if current_user.is_authenticated:
             return redirect('/')
         else:
             return render_template('signin.html')
@@ -99,10 +130,9 @@ def create_app(config_class=Config):
         password = request.form.get('password')
 
         user = user_service.signin(username=username, password=password)
-        user = jsonify(user)
 
         if user:
-            session['user'] = user[0]
+            login_user(user=user)
             return redirect('/')
         else:
             return render_template('signin.html', message='Sai tên tài khoản hoặc mật khẩu, xin vui lòng thử lại.')
@@ -110,7 +140,7 @@ def create_app(config_class=Config):
 
     @app.get('/signup')
     def signup_page():
-        if 'user' in session:
+        if current_user.is_authenticated:
             return redirect('/')
         else:
             return render_template('signup.html')
@@ -122,7 +152,9 @@ def create_app(config_class=Config):
         email = request.form.get('email')
         username = request.form.get('username')
         password = request.form.get('password')
-        avatar = request.form.get('avatar')
+        avatar = request.files.get('avatar')
+
+        avatar = cloudinary.uploader.upload(avatar, public_id=str(uuid.uuid4()))['url']
 
         try:
             user_service.signup(full_name=full_name, username=username, email=email, password=password, avatar=avatar)
@@ -153,5 +185,17 @@ def create_app(config_class=Config):
             return redirect('/signin')
         else:
             return '<h1>Error occurred</h1>'
+
+
+    @app.post('/admin/signin')
+    def admin_signin():
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = user_service.signin(username=username, password=password)
+
+        if user:
+            login_user(user=user)
+        return redirect('/admin')
 
     return app

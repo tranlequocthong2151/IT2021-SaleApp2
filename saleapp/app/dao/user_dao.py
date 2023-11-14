@@ -12,7 +12,7 @@ def get_user(id=None, username='', password='', email=''):
         user = user.filter(User.password == password)
     if email:
         user = user.filter(User.email == email)
-    return user.all()[0]
+    return user.first()
 
 
 def get_users():

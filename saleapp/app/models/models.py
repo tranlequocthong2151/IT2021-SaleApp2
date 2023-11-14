@@ -29,6 +29,9 @@ class Product(db.Model):
     image = Column(String(100))
     category_id = Column(Integer, ForeignKey(Category.id), nullable=False)
 
+    def __str__(self):
+        return self.name
+
 
 class UserRole(enum.IntEnum):
     USER = 0
@@ -44,11 +47,11 @@ class User(db.Model, UserMixin):
     username = Column(String(50), nullable=False, unique=True)
     password = Column(String(50), nullable=False)
     active = Column(Boolean, default=False)
-    avatar = Column(String(100))
+    avatar = Column(String(255))
     joined_date = Column(DateTime, server_default=func.now())
     user_role = Column(Enum(UserRole), default=UserRole.USER)
 
-    def as_dict(self):
-       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    def __str__(self):
+        return self.name
 
 
