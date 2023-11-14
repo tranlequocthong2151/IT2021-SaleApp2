@@ -16,6 +16,7 @@ from app.services import product_service
 from app.services import category_service
 from app.services import user_service
 from app.services import token_service
+from app.models.models import UserRole
 
 
 def create_app(config_class=Config):
@@ -43,7 +44,17 @@ def create_app(config_class=Config):
 
     @app.get('/carts')
     def cart_page():
-        return render_template('cart.html')
+        products = []
+        if session['cart']:
+            for id in session['cart']:
+                product = product_service.get_product(int(id))
+                if product:
+                    product.quantity = session['cart'][id]
+                    products.append(product)
+        amount = 0
+        for product in products:
+            amount += product.price
+        return render_template('cart.html', products=products, amount=amount)
 
 
     @app.post('/carts/<product_id>')
@@ -194,7 +205,7 @@ def create_app(config_class=Config):
 
         user = user_service.signin(username=username, password=password)
 
-        if user:
+        if user and user.user_role == UserRole.ADMIN:
             login_user(user=user)
         return redirect('/admin')
 

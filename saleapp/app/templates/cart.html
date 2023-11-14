@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class='container'>
+    {% for product in products %}
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <img src="{{product.image}}" class="img-thumbnail" alt="{{ product.name }}">
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <h5>{{ product.name }}</h5>
+            <p>Description: {{ product.description }}</p>
+            <p>Price: {{ product.price }}</p>
+            <p>Quantity: {{ product.quantity }}</p>
+        </div>
+    </div>
+    {% endfor %}
+    <div class="mt-5">
+        <h5>Total: {{amount}} VND</h5>
+    </div>
+</div>
+{% endblock %}

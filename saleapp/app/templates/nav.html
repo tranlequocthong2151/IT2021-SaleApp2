@@ -40,11 +40,11 @@
                         class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         {{(session['cart'].keys())|length if 'cart' in session else 0}}
                     </span>
-                    </>
-                    {% else %}
-                    <a href="/signin" class="btn btn-primary">Sign in</a>
-                    <a href="/signup" class="btn btn-secondary">Sign up</a>
-                    {% endif %}
+                </a>
+                {% else %}
+                <a href="/signin" class="btn btn-primary">Sign in</a>
+                <a href="/signup" class="btn btn-secondary">Sign up</a>
+                {% endif %}
             </div>
         </div>
     </div>
