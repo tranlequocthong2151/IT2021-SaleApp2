@@ -1,4 +1,4 @@
-from app.models.models import Category
+from app.models import Category
 
 
 def get_categories():

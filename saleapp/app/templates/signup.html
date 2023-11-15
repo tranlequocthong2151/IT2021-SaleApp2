@@ -6,7 +6,7 @@
 <h4>{{message}}</h4>
 {% endif %}
 
-<form action='/signup' method='POST' class='auth-form'>
+<form action='/signup' method='POST' class='auth-form' enctype="multipart/form-data">
     <div class='mb-3'>
         <label for='full_name'>Fullname:</label>
         <input type="text" required placeholder='John Doe' id='full_name' name='full_name'>

@@ -14,7 +14,7 @@ def get_users():
     return user_dao.get_users()
 
 
-def get_user(id, email):
+def get_user(id=None, email=None):
     return user_dao.get_user(id=id, email=email)
 
 

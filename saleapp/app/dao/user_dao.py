@@ -1,5 +1,5 @@
-from app.models.models import User
-from app.extensions import db
+from app.models import User
+from app.models import db
 
 
 def get_user(id=None, username='', password='', email=''):
@@ -12,7 +12,7 @@ def get_user(id=None, username='', password='', email=''):
         user = user.filter(User.password == password)
     if email:
         user = user.filter(User.email == email)
-    return user.all()[0]
+    return user.first()
 
 
 def get_users():
