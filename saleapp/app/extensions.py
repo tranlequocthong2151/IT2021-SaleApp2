@@ -1,17 +1,11 @@
-import os
-
-from flask_sqlalchemy import SQLAlchemy
 import cloudinary
 
 
-db = SQLAlchemy()
-          
-
-def init_cloudinary():
+def init_cloudinary(app):
     cloudinary.config( 
-        cloud_name = os.environ.get('CLOUDINARY_NAME'), 
-        api_key = os.environ.get('CLOUDINARY_API_KEY'), 
-        api_secret = os.environ.get('CLOUDINARY_API_SECRET'), 
+        cloud_name = app.config.get('CLOUDINARY_NAME'), 
+        api_key = app.config.get('CLOUDINARY_API_KEY'), 
+        api_secret = app.config.get('CLOUDINARY_API_SECRET'), 
     )
 
 

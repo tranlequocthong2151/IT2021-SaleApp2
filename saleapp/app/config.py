@@ -20,4 +20,7 @@ class Config:
     ITD_KEY=os.getenv('ITD_KEY')
     ITD_SALT=os.getenv('ITD_SALT')
     
+    CLOUDINARY_NAME= os.getenv('CLOUDINARY_NAME'), 
+    CLOUDINARY_API_KEY= os.getenv('CLOUDINARY_API_KEY'), 
+    CLOUDINARY_API_SECRET = os.getenv('cloudinary_api_secret'), 
 

@@ -163,3 +163,5 @@ venv
 *.pyc
 
 run.sh
+
+.vscode

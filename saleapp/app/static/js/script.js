@@ -1,26 +1,57 @@
-// var $ = document.querySelector.bind(document)
-// var $$ = document.querySelectorAll.bind(document)
+document.addEventListener('DOMContentLoaded', function () {
+    var paginationLinks = document.querySelectorAll('.pagination a')
 
-// window.onload = function init() {
-//     const addToCartButtons = $$('.add-to-cart-button')
-//     addToCartButtons.forEach(button => {
-//         button.addEventListener('click', function add(e) {
-//             addToCart(e.target.attributes['data-id'].value)
-//         })
-//     })
-// }
+    paginationLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            e.preventDefault()
 
-// async function addToCart(id) {
-//     try {
-//         await fetch(`/carts/${id}`, {
-//             method: 'POST',
-//             headers: {
-//                 'Accept': 'application/json',
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify({ quantity: 1 })
-//         })
-//     } catch (error) {
-//         console.log(error.message)
-//     }
-// }
+            var urlParams = new URLSearchParams(window.location.search)
+            var page = link.getAttribute('data-page')
+            urlParams.set('page', page)
+            window.location.href = window.location.pathname + '?' + urlParams
+        })
+    })
+
+    var addToCartButtons = document.querySelectorAll('.add-to-cart-button')
+
+    addToCartButtons.forEach(function (button) {
+        button.addEventListener('click', function (e) {
+            e.preventDefault()
+
+            var productId = button.getAttribute('product-id')
+            fetch(`/cart/${productId}`, {
+                method: 'POST',
+            })
+                .then(response => response.json())
+                .then(_ => {
+                    location.reload()
+                })
+                .catch(error => console.error('Error:', error))
+        })
+    })
+
+    var deleteButtons = document.querySelectorAll('.cart-delete-product-button')
+
+    deleteButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            var productId = button.getAttribute('product-id')
+
+            fetch(`/cart/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok')
+                    }
+                    return response.json()
+                })
+                .then(data => {
+                    location.reload()
+                })
+                .catch(error => console.error('Error:', error))
+        })
+    })
+})

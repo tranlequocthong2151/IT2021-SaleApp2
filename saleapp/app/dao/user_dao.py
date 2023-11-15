@@ -1,5 +1,5 @@
-from app.models.models import User
-from app.extensions import db
+from app.models import User
+from app.models import db
 
 
 def get_user(id=None, username='', password='', email=''):

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class='container'>
+    {% if products|length %}
     {% for product in products %}
     <div class="row">
         <div class="col-sm-12 col-md-6">
@@ -10,12 +11,25 @@
             <h5>{{ product.name }}</h5>
             <p>Description: {{ product.description }}</p>
             <p>Price: {{ product.price }}</p>
-            <p>Quantity: {{ product.quantity }}</p>
+            <form class='quantity-form mb-5'>
+                <label for='quantity'>Quantity:</label>
+                <input type="number" name="quantity" id="quantity" value='{{product.quantity}}'>
+            </form>
+
+            <button type="submit" class="btn btn-primary position-relative cart-delete-product-button"
+                product-id='{{product.id}}'>
+                <i class="fa-solid fa-trash"></i>
+            </button>
         </div>
     </div>
     {% endfor %}
     <div class="mt-5">
-        <h5>Total: {{amount}} VND</h5>
+        <h5 class='text-end'>Total: {{amount}} VND</h5>
     </div>
+    {% else %}
+    <div class="mt-5 ml-auto">
+        <h5 class='text-center'>You cart is empty.</h5>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

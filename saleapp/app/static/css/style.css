@@ -13,3 +13,7 @@
     align-items: center;
     justify-content: center;
 }
+
+.quantity-form>#quantity {
+    width: 80px;
+}

@@ -4,12 +4,13 @@ from flask_admin import Admin
 from flask_login import logout_user, current_user
 from flask import redirect
 
-from app.models.models import Category, Product, User
+from app import app, db
+from app.models import Category, Product, User, UserRole
 
 
 class PrivateView(BaseView):
     def is_accessible(self):
-        return current_user.is_authenticated and current_user.user_role == 1
+        return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
 
 
 class StatsView(PrivateView):
@@ -34,7 +35,6 @@ class PrivateModelView(ModelView, PrivateView):
     can_view_details = True
 
 
-
 class ProductView(PrivateModelView):
     column_list = ['id', 'name', 'description', 'price', 'category']
 
@@ -49,13 +49,11 @@ class SalesPage(BaseView):
         return redirect('/')
 
 
-def init_admin(app, db):
-    admin = Admin(app, name="Quan ly ban hang",
-    template_mode="bootstrap4")
-    admin.add_view(SalesPage(name='Sales'))
-    admin.add_view(CategoryView(Category, db.session))
-    admin.add_view(PrivateModelView(User, db.session))
-    admin.add_view(ProductView(Product, db.session))
-    admin.add_view(StatsView(name='Stats'))
-    admin.add_view(SignoutView(name='Signout'))
-    return admin
+
+admin = Admin(app, name="Quan ly ban hang", template_mode="bootstrap4")
+admin.add_view(SalesPage(name='Sales'))
+admin.add_view(CategoryView(Category, db.session))
+admin.add_view(PrivateModelView(User, db.session))
+admin.add_view(ProductView(Product, db.session))
+admin.add_view(StatsView(name='Stats'))
+admin.add_view(SignoutView(name='Signout'))
